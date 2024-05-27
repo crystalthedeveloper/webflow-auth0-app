@@ -1,0 +1,25 @@
+{
+  "name": "webflow-auth0-app",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "firebase": "^10.12.2",
+    "node-fetch": "^3.3.2",
+    "parcel": "^2.12.0",
+    "request": "^2.88.2",
+    "webflow-api": "^2.3.2"
+  },
+  "devDependencies": {
+    "buffer": "^6.0.3",
+    "process": "^0.11.10"
+  }
+}
