@@ -1,7 +1,3 @@
-// Import the individual Firebase services you need
-import { initializeApp } from 'firebase/app'; // Import the core Firebase module
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'; // Import Firebase Authentication module
-import { getFirestore } from 'firebase/firestore'; // Import Firebase Firestore module (if needed)
 
 // Your Firebase configuration
 const firebaseConfig = {
