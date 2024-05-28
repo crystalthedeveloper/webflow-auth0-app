@@ -1,3 +1,5 @@
+// Import the dotenv package to load environment variables
+import 'dotenv/config';
 
 // Your Firebase configuration
 const firebaseConfig = {
