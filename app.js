@@ -63,7 +63,19 @@ async function handleDeleteAccount() {
 
 // Ensure DOM is fully loaded before adding event listeners
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('login-btn').addEventListener('click', handleLogin);
-  document.getElementById('signup-btn').addEventListener('click', handleSignup);
-  document.getElementById('delete-account-btn').addEventListener('click', handleDeleteAccount);
+  const loginBtn = document.getElementById('login-btn');
+  const signupBtn = document.getElementById('signup-btn');
+  const deleteAccountBtn = document.getElementById('delete-account-btn');
+
+  if (loginBtn) {
+    loginBtn.addEventListener('click', handleLogin);
+  }
+
+  if (signupBtn) {
+    signupBtn.addEventListener('click', handleSignup);
+  }
+
+  if (deleteAccountBtn) {
+    deleteAccountBtn.addEventListener('click', handleDeleteAccount);
+  }
 });
