@@ -584,12 +584,18 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 }
 
 },{}],"igcvL":[function(require,module,exports) {
-const express = require("fbe00c140332bcaa");
-const bodyParser = require("c594c886d14b8d0a");
-const fetch = require("dcc5f9352a6cda5");
-require("5de74e37d10d60b1").config();
-const app = express();
-app.use(bodyParser.json());
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+var _express = require("express");
+var _expressDefault = parcelHelpers.interopDefault(_express);
+var _bodyParser = require("body-parser");
+var _bodyParserDefault = parcelHelpers.interopDefault(_bodyParser);
+var _nodeFetch = require("node-fetch");
+var _nodeFetchDefault = parcelHelpers.interopDefault(_nodeFetch);
+var _dotenv = require("dotenv");
+var _dotenvDefault = parcelHelpers.interopDefault(_dotenv);
+(0, _dotenvDefault.default).config();
+const app = (0, _expressDefault.default)();
+app.use((0, _bodyParserDefault.default).json());
 const WEBFLOW_API_TOKEN = "327ee845b726bd57582609e4e09f49ebf127a13505929147b8791fd7eac3d451";
 const WEBFLOW_SITE_ID = "65f0d5739b651eae06b2ca56";
 app.post("/delete-webflow-account", async (req, res)=>{
@@ -606,7 +612,7 @@ app.post("/delete-webflow-account", async (req, res)=>{
                 "Accept": "application/json"
             }
         };
-        const response = await fetch(url, options);
+        const response = await (0, _nodeFetchDefault.default)(url, options);
         const json = await response.json();
         if (response.ok) res.json({
             success: true,
@@ -627,7 +633,7 @@ app.listen(PORT, ()=>{
     console.log(`Server is running on port ${PORT}`);
 });
 
-},{"fbe00c140332bcaa":"nvDge","c594c886d14b8d0a":"dTImT","dcc5f9352a6cda5":"aDuCU","5de74e37d10d60b1":"lErsX"}],"nvDge":[function(require,module,exports) {
+},{"express":"nvDge","body-parser":"dTImT","node-fetch":"aDuCU","dotenv":"lErsX","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"nvDge":[function(require,module,exports) {
 /*!
  * express
  * Copyright(c) 2009-2013 TJ Holowaychuk
