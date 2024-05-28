@@ -1,19 +1,46 @@
-// Example using Express.js
 const express = require('express');
+const bodyParser = require('body-parser');
+const fetch = require('node-fetch');
+require('dotenv').config();
+
 const app = express();
+app.use(bodyParser.json());
+
+const WEBFLOW_API_TOKEN = process.env.WEBFLOW_API_TOKEN;
+const WEBFLOW_SITE_ID = process.env.WEBFLOW_SITE_ID;
 
 app.post('/delete-webflow-account', async (req, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID is required' });
+  }
+
   try {
-    // Add logic here to authenticate with Webflow API and delete the user account
-    // Example: Make a request to Webflow API using appropriate authentication
-    // Once the account is deleted, send a success response back to the client
-    res.json({ success: true });
+    const url = `https://api.webflow.com/v2/sites/${WEBFLOW_SITE_ID}/users/${userId}`;
+    const options = {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${WEBFLOW_API_TOKEN}`,
+        'Accept': 'application/json'
+      }
+    };
+
+    const response = await fetch(url, options);
+    const json = await response.json();
+
+    if (response.ok) {
+      res.json({ success: true, data: json });
+    } else {
+      res.status(response.status).json({ error: json });
+    }
   } catch (error) {
     console.error('Error deleting Webflow user account:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+const PORT = process.env.PORT || 1234;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
