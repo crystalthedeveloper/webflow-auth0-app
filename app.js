@@ -4,6 +4,7 @@ import bodyParser from 'body-parser'; // Middleware for parsing request bodies
 import fetch from 'node-fetch'; // Library for making HTTP requests
 import dotenv from 'dotenv'; // Module for loading environment variables
 import admin from 'firebase-admin'; // Firebase Admin SDK for authentication
+import cors from 'cors'; // Middleware for enabling CORS
 
 // Load environment variables from .env file
 dotenv.config();
@@ -11,6 +12,14 @@ dotenv.config();
 // Initialize Express application
 const app = express();
 app.use(bodyParser.json()); // Use JSON body parser middleware
+
+// Enable CORS for all routes
+const corsOptions = {
+  origin: 'https://firststep-46e83b.webflow.io', // Replace with your specific origin
+  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
+
+app.use(cors(corsOptions));
 
 // Retrieve environment variables
 const WEBFLOW_API_TOKEN = process.env.WEBFLOW_API_TOKEN;

@@ -3,8 +3,10 @@ import $lVf1n$bodyparser from "body-parser";
 import $lVf1n$nodefetch from "node-fetch";
 import $lVf1n$dotenv from "dotenv";
 import $lVf1n$firebaseadmin from "firebase-admin";
+import $lVf1n$cors from "cors";
 
 // Import required modules
+
 
 
 
@@ -15,6 +17,12 @@ import $lVf1n$firebaseadmin from "firebase-admin";
 // Initialize Express application
 const $5ef8cbb8c4725867$var$app = (0, $lVf1n$express)();
 $5ef8cbb8c4725867$var$app.use((0, $lVf1n$bodyparser).json()); // Use JSON body parser middleware
+// Enable CORS for all routes
+const $5ef8cbb8c4725867$var$corsOptions = {
+    origin: "https://firststep-46e83b.webflow.io",
+    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
+$5ef8cbb8c4725867$var$app.use((0, $lVf1n$cors)($5ef8cbb8c4725867$var$corsOptions));
 // Retrieve environment variables
 const $5ef8cbb8c4725867$var$WEBFLOW_API_TOKEN = "327ee845b726bd57582609e4e09f49ebf127a13505929147b8791fd7eac3d451";
 const $5ef8cbb8c4725867$var$WEBFLOW_SITE_ID = "65f0d5739b651eae06b2ca56";
