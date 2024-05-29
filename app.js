@@ -6,7 +6,6 @@ import('node-fetch').then(fetch => {
 const dotenv = require('dotenv');
 const admin = require('firebase-admin');
 
-
 // Load environment variables from .env file
 dotenv.config();
 
@@ -27,7 +26,6 @@ module.exports = async (req, res) => {
 
   // Your function logic
   if (req.method === 'DELETE') {
-    // Your route handler
     // Retrieve environment variables
     const WEBFLOW_API_TOKEN = process.env.WEBFLOW_API_TOKEN;
     const WEBFLOW_SITE_ID = process.env.WEBFLOW_SITE_ID;
@@ -50,7 +48,10 @@ module.exports = async (req, res) => {
         return res.status(403).json({ error: 'Unauthorized access' }); // Return 403 Forbidden if unauthorized
       }
 
-      // Proceed with deleting the Webflow user account
+      // Delete user from Firebase
+      await admin.auth().deleteUser(userId);
+
+      // Delete user from Webflow
       const url = `https://api.webflow.com/v2/sites/${WEBFLOW_SITE_ID}/users/${userId}`; // Webflow API endpoint
       const options = {
         method: 'DELETE', // HTTP DELETE method
@@ -71,7 +72,7 @@ module.exports = async (req, res) => {
       const json = await response.json(); // Parse JSON response
       return res.json({ success: true, data: json }); // Return success response with data
     } catch (error) {
-      console.error('Error deleting Webflow user account:', error);
+      console.error('Error deleting user accounts:', error);
       // Handle other potential errors
       return res.status(500).json({ error: 'Internal Server Error' }); // Return 500 Internal Server Error response
     }

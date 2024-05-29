@@ -23,9 +23,10 @@ $43HA1$firebaseadmin.initializeApp({
 module.exports = async (req, res)=>{
     // Set CORS headers
     res.setHeader("Access-Control-Allow-Origin", "https://firststep-46e83b.webflow.io");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     // Your function logic
     if (req.method === "DELETE") {
-        // Your route handler
         // Retrieve environment variables
         const WEBFLOW_API_TOKEN = "327ee845b726bd57582609e4e09f49ebf127a13505929147b8791fd7eac3d451";
         const WEBFLOW_SITE_ID = "65f0d5739b651eae06b2ca56";
@@ -43,7 +44,9 @@ module.exports = async (req, res)=>{
             if (uid !== userId) return res.status(403).json({
                 error: "Unauthorized access"
             }); // Return 403 Forbidden if unauthorized
-            // Proceed with deleting the Webflow user account
+            // Delete user from Firebase
+            await $43HA1$firebaseadmin.auth().deleteUser(userId);
+            // Delete user from Webflow
             const url = `https://api.webflow.com/v2/sites/${WEBFLOW_SITE_ID}/users/${userId}`; // Webflow API endpoint
             const options = {
                 method: "DELETE",
@@ -66,7 +69,7 @@ module.exports = async (req, res)=>{
                 data: json
             }); // Return success response with data
         } catch (error) {
-            console.error("Error deleting Webflow user account:", error);
+            console.error("Error deleting user accounts:", error);
             // Handle other potential errors
             return res.status(500).json({
                 error: "Internal Server Error"
