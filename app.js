@@ -26,6 +26,9 @@ module.exports = async (req, res) => {
 
   if (req.method === 'OPTIONS') {
     // Handle preflight requests
+    res.setHeader('Access-Control-Allow-Origin', 'https://firststep-46e83b.webflow.io');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     return res.status(200).end();
   }
 
@@ -34,7 +37,6 @@ module.exports = async (req, res) => {
     // Retrieve environment variables
     const WEBFLOW_API_TOKEN = process.env.WEBFLOW_API_TOKEN;
     const WEBFLOW_SITE_ID = process.env.WEBFLOW_SITE_ID;
-
     const { email } = req.body;  // Expect email in the request body
 
     if (!email) {
