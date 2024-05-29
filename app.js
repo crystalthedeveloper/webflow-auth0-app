@@ -1,45 +1,77 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import fetch from 'node-fetch';
-import dotenv from 'dotenv';
+// Import required modules
+import express from 'express'; // Express.js framework
+import bodyParser from 'body-parser'; // Middleware for parsing request bodies
+import fetch from 'node-fetch'; // Library for making HTTP requests
+import dotenv from 'dotenv'; // Module for loading environment variables
+import admin from 'firebase-admin'; // Firebase Admin SDK for authentication
 
+// Load environment variables from .env file
 dotenv.config();
 
+// Initialize Express application
 const app = express();
-app.use(bodyParser.json());
+app.use(bodyParser.json()); // Use JSON body parser middleware
 
+// Retrieve environment variables
 const WEBFLOW_API_TOKEN = process.env.WEBFLOW_API_TOKEN;
 const WEBFLOW_SITE_ID = process.env.WEBFLOW_SITE_ID;
 
-app.post('/delete-webflow-account', async (req, res) => {
-  const { userId } = req.body;
+// Initialize Firebase Admin SDK with service account credentials
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID, // Firebase project ID
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL, // Firebase service account email
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') // Firebase service account private key
+  })
+});
 
-  if (!userId) {
-    return res.status(400).json({ error: 'User ID is required' });
+// Define route for deleting Webflow user account using RESTful convention
+app.delete('/users/:userId', async (req, res) => {
+  // Extract user ID from URL parameters and Firebase ID token from request body
+  const { userId } = req.params;
+  const { idToken } = req.body;
+
+  // Check if both user ID and ID token are provided
+  if (!userId || !idToken) {
+    return res.status(400).json({ error: 'User ID and ID token are required' });
   }
 
   try {
-    const url = `https://api.webflow.com/v2/sites/${WEBFLOW_SITE_ID}/users/${userId}`;
+    // Verify Firebase ID token
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const uid = decodedToken.uid; // Extract user ID from decoded token
+
+    // Check if the authenticated user matches the requested user ID
+    if (uid !== userId) {
+      return res.status(403).json({ error: 'Unauthorized access' }); // Return 403 Forbidden if unauthorized
+    }
+
+    // Proceed with deleting the Webflow user account
+    const url = `https://api.webflow.com/v2/sites/${WEBFLOW_SITE_ID}/users/${userId}`; // Webflow API endpoint
     const options = {
-      method: 'DELETE',
+      method: 'DELETE', // HTTP DELETE method
       headers: {
-        'Authorization': `Bearer ${WEBFLOW_API_TOKEN}`,
-        'Accept': 'application/json'
+        'Authorization': `Bearer ${WEBFLOW_API_TOKEN}`, // Authorization header with Webflow API token
+        'Accept': 'application/json' // Accept JSON response
       }
     };
 
-    const response = await fetch(url, options);
-    const json = await response.json();
+    const response = await fetch(url, options); // Send DELETE request to Webflow API
 
-    if (response.ok) {
-      res.json({ success: true, data: json });
-    } else {
-      res.status(response.status).json({ error: json });
+    // Check for network errors
+    if (!response.ok) {
+      const errorData = await response.json(); // Extract error data from response
+      return res.status(response.status).json({ error: errorData }); // Return error response
     }
+
+    const json = await response.json(); // Parse JSON response
+    res.json({ success: true, data: json }); // Return success response with data
   } catch (error) {
     console.error('Error deleting Webflow user account:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Handle other potential errors
+    res.status(500).json({ error: 'Internal Server Error' }); // Return 500 Internal Server Error response
   }
 });
 
+// Export the Express app as the default module
 export default app;
