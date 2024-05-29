@@ -21,6 +21,12 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// OR for more granular control, apply it to specific routes:
+app.options('/users/:userId', cors(corsOptions)); // Preflight requests for DELETE route
+app.delete('/users/:userId', cors(corsOptions), async (req, res) => {
+  // Your route handler
+});
+
 // Retrieve environment variables
 const WEBFLOW_API_TOKEN = process.env.WEBFLOW_API_TOKEN;
 const WEBFLOW_SITE_ID = process.env.WEBFLOW_SITE_ID;
