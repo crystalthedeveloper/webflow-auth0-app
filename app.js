@@ -24,6 +24,11 @@ module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
+  if (req.method === 'OPTIONS') {
+    // Handle preflight requests
+    return res.status(200).end();
+  }
+
   // Your function logic
   if (req.method === 'DELETE') {
     // Retrieve environment variables
