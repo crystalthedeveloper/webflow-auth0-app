@@ -22,6 +22,8 @@ admin.initializeApp({
 module.exports = async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', 'https://firststep-46e83b.webflow.io');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   // Your function logic
   if (req.method === 'DELETE') {
