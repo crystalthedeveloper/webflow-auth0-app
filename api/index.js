@@ -32,24 +32,16 @@ module.exports = async (req, res)=>{
         // Retrieve environment variables
         const WEBFLOW_API_TOKEN = "327ee845b726bd57582609e4e09f49ebf127a13505929147b8791fd7eac3d451";
         const WEBFLOW_SITE_ID = "65f0d5739b651eae06b2ca56";
-        const { userId: userId } = req.query;
-        const { idToken: idToken } = req.body;
-        // Check if both user ID and ID token are provided
-        if (!userId || !idToken) return res.status(400).json({
-            error: "User ID and ID token are required"
+        const { email: email } = req.body; // Expect email in the request body
+        if (!email) return res.status(400).json({
+            error: "Email is required"
         });
         try {
-            // Verify Firebase ID token
-            const decodedToken = await $43HA1$firebaseadmin.auth().verifyIdToken(idToken);
-            const uid = decodedToken.uid; // Extract user ID from decoded token
-            // Check if the authenticated user matches the requested user ID
-            if (uid !== userId) return res.status(403).json({
-                error: "Unauthorized access"
-            }); // Return 403 Forbidden if unauthorized
             // Delete user from Firebase
-            await $43HA1$firebaseadmin.auth().deleteUser(userId);
+            const user = await $43HA1$firebaseadmin.auth().getUserByEmail(email);
+            await $43HA1$firebaseadmin.auth().deleteUser(user.uid);
             // Delete user from Webflow
-            const url = `https://api.webflow.com/v2/sites/${WEBFLOW_SITE_ID}/users/${userId}`; // Webflow API endpoint
+            const url = `https://api.webflow.com/v2/sites/${WEBFLOW_SITE_ID}/users/${user.uid}`; // Webflow API endpoint
             const options = {
                 method: "DELETE",
                 headers: {
@@ -58,7 +50,6 @@ module.exports = async (req, res)=>{
                 }
             };
             const response = await fetch(url, options); // Send DELETE request to Webflow API
-            // Check for network errors
             if (!response.ok) {
                 const errorData = await response.json(); // Extract error data from response
                 return res.status(response.status).json({

@@ -35,29 +35,19 @@ module.exports = async (req, res) => {
     const WEBFLOW_API_TOKEN = process.env.WEBFLOW_API_TOKEN;
     const WEBFLOW_SITE_ID = process.env.WEBFLOW_SITE_ID;
 
-    const { userId } = req.query;
-    const { idToken } = req.body;
+    const { email } = req.body;  // Expect email in the request body
 
-    // Check if both user ID and ID token are provided
-    if (!userId || !idToken) {
-      return res.status(400).json({ error: 'User ID and ID token are required' });
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
     }
 
     try {
-      // Verify Firebase ID token
-      const decodedToken = await admin.auth().verifyIdToken(idToken);
-      const uid = decodedToken.uid; // Extract user ID from decoded token
-
-      // Check if the authenticated user matches the requested user ID
-      if (uid !== userId) {
-        return res.status(403).json({ error: 'Unauthorized access' }); // Return 403 Forbidden if unauthorized
-      }
-
       // Delete user from Firebase
-      await admin.auth().deleteUser(userId);
+      const user = await admin.auth().getUserByEmail(email);
+      await admin.auth().deleteUser(user.uid);
 
       // Delete user from Webflow
-      const url = `https://api.webflow.com/v2/sites/${WEBFLOW_SITE_ID}/users/${userId}`; // Webflow API endpoint
+      const url = `https://api.webflow.com/v2/sites/${WEBFLOW_SITE_ID}/users/${user.uid}`; // Webflow API endpoint
       const options = {
         method: 'DELETE', // HTTP DELETE method
         headers: {
@@ -68,7 +58,6 @@ module.exports = async (req, res) => {
 
       const response = await fetch(url, options); // Send DELETE request to Webflow API
 
-      // Check for network errors
       if (!response.ok) {
         const errorData = await response.json(); // Extract error data from response
         return res.status(response.status).json({ error: errorData }); // Return error response
