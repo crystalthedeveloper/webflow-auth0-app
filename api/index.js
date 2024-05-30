@@ -1,22 +1,23 @@
-var $43HA1$dotenv = require("dotenv");
-var $43HA1$express = require("express");
-var $43HA1$httpproxymiddleware = require("http-proxy-middleware");
+var $7Uu7Z$express = require("express");
+var $7Uu7Z$httpproxymiddleware = require("http-proxy-middleware");
+var $7Uu7Z$dotenv = require("dotenv");
+
+// pages/api/deleteUser.js
 
 
+var $8c7a90f1c90ba1b0$require$createProxyMiddleware = $7Uu7Z$httpproxymiddleware.createProxyMiddleware;
 
-var $84a264530b3fb4fb$require$createProxyMiddleware = $43HA1$httpproxymiddleware.createProxyMiddleware;
-
-$43HA1$dotenv.config();
-const $84a264530b3fb4fb$var$app = $43HA1$express();
+$7Uu7Z$dotenv.config();
+const $8c7a90f1c90ba1b0$var$app = $7Uu7Z$express();
 // CORS middleware
-$84a264530b3fb4fb$var$app.use((req, res, next)=>{
+$8c7a90f1c90ba1b0$var$app.use((req, res, next)=>{
     res.setHeader("Access-Control-Allow-Origin", "https://firststep-46e83b.webflow.io");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     next();
 });
 // Proxy middleware options
-const $84a264530b3fb4fb$var$options = {
+const $8c7a90f1c90ba1b0$var$options = {
     target: "https://api.webflow.com",
     changeOrigin: true,
     pathRewrite: {
@@ -24,19 +25,19 @@ const $84a264530b3fb4fb$var$options = {
     },
     onProxyReq: (proxyReq, req, res)=>{
         // Debug: Log the target and headers to verify
-        console.log(`Proxying request to: ${$84a264530b3fb4fb$var$options.target}`);
+        console.log(`Proxying request to: ${$8c7a90f1c90ba1b0$var$options.target}`);
         proxyReq.setHeader("Authorization", `Bearer ${"327ee845b726bd57582609e4e09f49ebf127a13505929147b8791fd7eac3d451"}`);
     }
 };
 // Debug: Log the entire options object
-console.log("Proxy options:", $84a264530b3fb4fb$var$options);
+console.log("Proxy options:", $8c7a90f1c90ba1b0$var$options);
 // Create the proxy
-const $84a264530b3fb4fb$var$apiProxy = $84a264530b3fb4fb$require$createProxyMiddleware($84a264530b3fb4fb$var$options);
+const $8c7a90f1c90ba1b0$var$apiProxy = $8c7a90f1c90ba1b0$require$createProxyMiddleware($8c7a90f1c90ba1b0$var$options);
 // Use the proxy middleware
-$84a264530b3fb4fb$var$app.use("/api", $84a264530b3fb4fb$var$apiProxy);
-const $84a264530b3fb4fb$var$PORT = "1234";
-$84a264530b3fb4fb$var$app.listen($84a264530b3fb4fb$var$PORT, ()=>{
-    console.log(`Proxy server is running on port ${$84a264530b3fb4fb$var$PORT}`);
+$8c7a90f1c90ba1b0$var$app.use("/api", $8c7a90f1c90ba1b0$var$apiProxy);
+const $8c7a90f1c90ba1b0$var$PORT = "1234";
+$8c7a90f1c90ba1b0$var$app.listen($8c7a90f1c90ba1b0$var$PORT, ()=>{
+    console.log(`Proxy server is running on port ${$8c7a90f1c90ba1b0$var$PORT}`);
 });
 
 
