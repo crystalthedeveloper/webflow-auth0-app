@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
 import('node-fetch').then(fetch => {
@@ -13,6 +12,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+
 app.use(cors({
   origin: 'https://firststep-46e83b.webflow.io',
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
@@ -27,7 +27,9 @@ admin.initializeApp({
   })
 });
 
-app.delete('/deleteUser', async (req, res) => {
+app.options('*', cors());
+
+app.delete('/api/deleteUser', async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
