@@ -1,14 +1,18 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
-const cors = require('cors');
 const dotenv = require('dotenv');
 
 dotenv.config();
 
 const app = express();
 
-// Enable CORS for all origins
-app.use(cors());
+// CORS middleware
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://firststep-46e83b.webflow.io');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
 
 // Proxy middleware options
 const options = {

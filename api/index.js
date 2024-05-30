@@ -1,29 +1,20 @@
 var $43HA1$dotenv = require("dotenv");
 var $43HA1$express = require("express");
-var $43HA1$cors = require("cors");
 var $43HA1$httpproxymiddleware = require("http-proxy-middleware");
 
 
 
 var $84a264530b3fb4fb$require$createProxyMiddleware = $43HA1$httpproxymiddleware.createProxyMiddleware;
 
-
 $43HA1$dotenv.config();
 const $84a264530b3fb4fb$var$app = $43HA1$express();
-// Enable CORS for your frontend application
-$84a264530b3fb4fb$var$app.use($43HA1$cors({
-    origin: "https://firststep-46e83b.webflow.io",
-    methods: [
-        "GET",
-        "POST",
-        "DELETE",
-        "OPTIONS"
-    ],
-    allowedHeaders: [
-        "Content-Type",
-        "Authorization"
-    ]
-}));
+// CORS middleware
+$84a264530b3fb4fb$var$app.use((req, res, next)=>{
+    res.setHeader("Access-Control-Allow-Origin", "https://firststep-46e83b.webflow.io");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    next();
+});
 // Proxy middleware options
 const $84a264530b3fb4fb$var$options = {
     target: "https://api.webflow.com",
