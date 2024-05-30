@@ -30,14 +30,14 @@ app.options('*', (req, res) => {
 // Body parsing middleware
 app.use(express.json());
 
-// PUT route for updating user quiz completion count
-app.put('/api/updateQuizCompletionCount', async (req, res) => {
+// POST route for updating user quiz completion count
+app.post('/api/updateQuizCompletionCount', async (req, res) => {
   const { email, newCount } = req.body;
 
   // Add your logic here to update the user's quiz completion count
   try {
     const response = await fetch(`https://api.webflow.com/users/${email}`, {
-      method: 'PUT',
+      method: 'POST', // Use POST instead of PUT
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${process.env.WEBFLOW_API_TOKEN}`,

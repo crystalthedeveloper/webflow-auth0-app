@@ -8,7 +8,7 @@ require("node-fetch");
 var $8c7a90f1c90ba1b0$require$createProxyMiddleware = $7Uu7Z$httpproxymiddleware.createProxyMiddleware;
 
 
-$8c7a90f1c90ba1b0$importAsync$c3666201f05dcae.then((fetch)=>{
+$8c7a90f1c90ba1b0$importAsync$c3666201f05dcae.then((fetch1)=>{
 // Now you can use fetch here
 }).catch((err)=>{
     console.error("Failed to import node-fetch:", err);
@@ -18,32 +18,45 @@ const $8c7a90f1c90ba1b0$var$app = $7Uu7Z$express();
 // CORS middleware
 $8c7a90f1c90ba1b0$var$app.use((req, res, next)=>{
     res.setHeader("Access-Control-Allow-Origin", "https://firststep-46e83b.webflow.io");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     next();
 });
 // Handle preflight requests
 $8c7a90f1c90ba1b0$var$app.options("*", (req, res)=>{
     res.setHeader("Access-Control-Allow-Origin", "https://firststep-46e83b.webflow.io");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.status(200).send();
 });
 // Body parsing middleware
 $8c7a90f1c90ba1b0$var$app.use($7Uu7Z$express.json());
-// DELETE route for deleting user by email
-$8c7a90f1c90ba1b0$var$app.delete("/api/deleteUser", async (req, res)=>{
-    const { email: email } = req.body;
-    // Add your logic here to handle the deletion of the user by email
-    // For example, you can delete the user from the database or make additional requests to external APIs
-    // Handle errors and send appropriate responses
+// POST route for updating user quiz completion count
+$8c7a90f1c90ba1b0$var$app.post("/api/updateQuizCompletionCount", async (req, res)=>{
+    const { email: email, newCount: newCount } = req.body;
+    // Add your logic here to update the user's quiz completion count
     try {
-        // Delete user logic here
-        res.status(200).json({
-            message: `User with email ${email} deleted successfully`
+        const response = await fetch(`https://api.webflow.com/users/${email}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${"327ee845b726bd57582609e4e09f49ebf127a13505929147b8791fd7eac3d451"}`
+            },
+            body: JSON.stringify({
+                "quiz-completion-count": newCount
+            })
+        });
+        const json = await response.json();
+        if (response.ok) res.status(200).json({
+            message: `Quiz completion count updated for user with email ${email}`,
+            data: json
+        });
+        else res.status(400).json({
+            error: "Failed to update quiz completion count for user",
+            data: json
         });
     } catch (error) {
-        console.error("Error deleting user:", error);
+        console.error("Error updating quiz completion count:", error);
         res.status(500).json({
             error: "Internal Server Error"
         });
