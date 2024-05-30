@@ -1,70 +1,43 @@
 const express = require('express');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 const cors = require('cors');
-import('node-fetch').then(fetch => {
-  // Now you can use fetch here
-}).catch(err => {
-  console.error('Failed to import node-fetch:', err);
-});
-const admin = require('firebase-admin');
 const dotenv = require('dotenv');
 
 dotenv.config();
 
 const app = express();
-app.use(express.json());
 
+// Enable CORS for your frontend application
 app.use(cors({
   origin: 'https://firststep-46e83b.webflow.io',
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-admin.initializeApp({
-  credential: admin.credential.cert({
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
-  })
-});
-
-app.options('*', cors());
-
-app.delete('/api/deleteUser', async (req, res) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
+// Proxy middleware options
+const options = {
+  target: 'https://api.webflow.com', // target host
+  changeOrigin: true,                // needed for virtual hosted sites
+  pathRewrite: {
+    '^/api': '',                     // remove base path
+  },
+  onProxyReq: (proxyReq, req, res) => {
+    // Debug: Log the target and headers to verify
+    console.log(`Proxying request to: ${options.target}`);
+    proxyReq.setHeader('Authorization', `Bearer ${process.env.WEBFLOW_API_TOKEN}`);
   }
+};
 
-  try {
-    const user = await admin.auth().getUserByEmail(email);
-    await admin.auth().deleteUser(user.uid);
+// Debug: Log the entire options object
+console.log('Proxy options:', options);
 
-    const url = `https://api.webflow.com/v2/sites/${process.env.WEBFLOW_SITE_ID}/users/${user.uid}`;
-    const options = {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${process.env.WEBFLOW_API_TOKEN}`,
-        'Accept': 'application/json'
-      }
-    };
+// Create the proxy
+const apiProxy = createProxyMiddleware(options);
 
-    const response = await fetch(url, options);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      return res.status(response.status).json({ error: errorData });
-    }
-
-    const json = await response.json();
-    return res.json({ success: true, data: json });
-  } catch (error) {
-    console.error('Error deleting user accounts:', error);
-    return res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
+// Use the proxy middleware
+app.use('/api', apiProxy);
 
 const PORT = process.env.PORT || 1234;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Proxy server is running on port ${PORT}`);
 });
