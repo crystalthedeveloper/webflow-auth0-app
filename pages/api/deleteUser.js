@@ -1,4 +1,3 @@
-// pages/api/deleteUser.js
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const dotenv = require('dotenv');
@@ -37,6 +36,14 @@ const apiProxy = createProxyMiddleware(options);
 
 // Use the proxy middleware
 app.use('/api', apiProxy);
+
+// Handle preflight requests
+app.options('*', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://firststep-46e83b.webflow.io');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.status(200).send();
+});
 
 const PORT = process.env.PORT || 1234;
 app.listen(PORT, () => {

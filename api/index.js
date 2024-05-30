@@ -2,7 +2,6 @@ var $7Uu7Z$express = require("express");
 var $7Uu7Z$httpproxymiddleware = require("http-proxy-middleware");
 var $7Uu7Z$dotenv = require("dotenv");
 
-// pages/api/deleteUser.js
 
 
 var $8c7a90f1c90ba1b0$require$createProxyMiddleware = $7Uu7Z$httpproxymiddleware.createProxyMiddleware;
@@ -35,6 +34,13 @@ console.log("Proxy options:", $8c7a90f1c90ba1b0$var$options);
 const $8c7a90f1c90ba1b0$var$apiProxy = $8c7a90f1c90ba1b0$require$createProxyMiddleware($8c7a90f1c90ba1b0$var$options);
 // Use the proxy middleware
 $8c7a90f1c90ba1b0$var$app.use("/api", $8c7a90f1c90ba1b0$var$apiProxy);
+// Handle preflight requests
+$8c7a90f1c90ba1b0$var$app.options("*", (req, res)=>{
+    res.setHeader("Access-Control-Allow-Origin", "https://firststep-46e83b.webflow.io");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.status(200).send();
+});
 const $8c7a90f1c90ba1b0$var$PORT = "1234";
 $8c7a90f1c90ba1b0$var$app.listen($8c7a90f1c90ba1b0$var$PORT, ()=>{
     console.log(`Proxy server is running on port ${$8c7a90f1c90ba1b0$var$PORT}`);
