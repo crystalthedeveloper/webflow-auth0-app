@@ -22,14 +22,23 @@ app.options('*', (req, res) => {
   res.status(200).send();
 });
 
+// Body parsing middleware
+app.use(express.json());
+
 // DELETE route for deleting user by email
 app.delete('/api/deleteUser', (req, res) => {
   const { email } = req.body;
 
   // Add your logic here to handle the deletion of the user by email
   // For example, you can delete the user from the database or make additional requests to external APIs
-
-  res.status(200).json({ message: `User with email ${email} deleted successfully` });
+  // Handle errors and send appropriate responses
+  try {
+    // Delete user logic here
+    res.status(200).json({ message: `User with email ${email} deleted successfully` });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 // Proxy middleware options
