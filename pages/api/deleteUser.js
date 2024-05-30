@@ -1,6 +1,11 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const dotenv = require('dotenv');
+import('node-fetch').then(fetch => {
+  // Now you can use fetch here
+}).catch(err => {
+  console.error('Failed to import node-fetch:', err);
+});
 
 dotenv.config();
 
@@ -26,7 +31,7 @@ app.options('*', (req, res) => {
 app.use(express.json());
 
 // DELETE route for deleting user by email
-app.delete('/api/deleteUser', (req, res) => {
+app.delete('/api/deleteUser', async (req, res) => {
   const { email } = req.body;
 
   // Add your logic here to handle the deletion of the user by email

@@ -1,11 +1,18 @@
 var $7Uu7Z$express = require("express");
 var $7Uu7Z$httpproxymiddleware = require("http-proxy-middleware");
 var $7Uu7Z$dotenv = require("dotenv");
+require("node-fetch");
 
 
 
 var $8c7a90f1c90ba1b0$require$createProxyMiddleware = $7Uu7Z$httpproxymiddleware.createProxyMiddleware;
 
+
+$8c7a90f1c90ba1b0$importAsync$c3666201f05dcae.then((fetch)=>{
+// Now you can use fetch here
+}).catch((err)=>{
+    console.error("Failed to import node-fetch:", err);
+});
 $7Uu7Z$dotenv.config();
 const $8c7a90f1c90ba1b0$var$app = $7Uu7Z$express();
 // CORS middleware
@@ -25,7 +32,7 @@ $8c7a90f1c90ba1b0$var$app.options("*", (req, res)=>{
 // Body parsing middleware
 $8c7a90f1c90ba1b0$var$app.use($7Uu7Z$express.json());
 // DELETE route for deleting user by email
-$8c7a90f1c90ba1b0$var$app.delete("/api/deleteUser", (req, res)=>{
+$8c7a90f1c90ba1b0$var$app.delete("/api/deleteUser", async (req, res)=>{
     const { email: email } = req.body;
     // Add your logic here to handle the deletion of the user by email
     // For example, you can delete the user from the database or make additional requests to external APIs
