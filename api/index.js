@@ -2,10 +2,12 @@ var $7Uu7Z$express = require("express");
 var $7Uu7Z$httpproxymiddleware = require("http-proxy-middleware");
 var $7Uu7Z$dotenv = require("dotenv");
 require("node-fetch");
+var $7Uu7Z$cors = require("cors");
 
 
 
 var $8c7a90f1c90ba1b0$require$createProxyMiddleware = $7Uu7Z$httpproxymiddleware.createProxyMiddleware;
+
 
 
 $8c7a90f1c90ba1b0$importAsync$c3666201f05dcae.then((fetch1)=>{
@@ -16,27 +18,21 @@ $8c7a90f1c90ba1b0$importAsync$c3666201f05dcae.then((fetch1)=>{
 $7Uu7Z$dotenv.config();
 const $8c7a90f1c90ba1b0$var$app = $7Uu7Z$express();
 // CORS middleware
-$8c7a90f1c90ba1b0$var$app.use((req, res, next)=>{
-    res.setHeader("Access-Control-Allow-Origin", "https://firststep-46e83b.webflow.io");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    next();
-});
+$8c7a90f1c90ba1b0$var$app.use($7Uu7Z$cors({
+    origin: "https://firststep-46e83b.webflow.io",
+    methods: "GET, POST, PUT, DELETE, OPTIONS",
+    allowedHeaders: "Content-Type, Authorization"
+}));
 // Handle preflight requests
-$8c7a90f1c90ba1b0$var$app.options("*", (req, res)=>{
-    res.setHeader("Access-Control-Allow-Origin", "https://firststep-46e83b.webflow.io");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.status(200).send();
-});
+$8c7a90f1c90ba1b0$var$app.options("*", $7Uu7Z$cors());
 // Body parsing middleware
 $8c7a90f1c90ba1b0$var$app.use($7Uu7Z$express.json());
 // POST route for updating user quiz completion count
 $8c7a90f1c90ba1b0$var$app.post("/api/updateUser", async (req, res)=>{
     const { email: email, newQuizCompletionCount: newQuizCompletionCount } = req.body;
     try {
-        const response = await fetch(`https://api.webflow.com/users/${email}`, {
-            method: "PUT",
+        const response = await fetch(`https://api.webflow.com/v2/sites/${"65f0d5739b651eae06b2ca56"}/users/${email}`, {
+            method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${"327ee845b726bd57582609e4e09f49ebf127a13505929147b8791fd7eac3d451"}`
@@ -65,7 +61,7 @@ $8c7a90f1c90ba1b0$var$app.post("/api/updateUser", async (req, res)=>{
 $8c7a90f1c90ba1b0$var$app.delete("/api/deleteUser", async (req, res)=>{
     const { email: email } = req.body;
     try {
-        const response = await fetch(`https://api.webflow.com/users/${email}`, {
+        const response = await fetch(`https://api.webflow.com/v2/sites/${"65f0d5739b651eae06b2ca56"}/users/${email}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",

@@ -30,8 +30,8 @@ app.post('/api/updateUser', async (req, res) => {
   const { email, newQuizCompletionCount } = req.body;
 
   try {
-    const response = await fetch(`https://api.webflow.com/users/${email}`, {
-      method: 'PUT',
+    const response = await fetch(`https://api.webflow.com/v2/sites/${process.env.WEBFLOW_SITE_ID}/users/${email}`, {
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${process.env.WEBFLOW_API_TOKEN}`,
@@ -57,7 +57,7 @@ app.delete('/api/deleteUser', async (req, res) => {
   const { email } = req.body;
 
   try {
-    const response = await fetch(`https://api.webflow.com/users/${email}`, {
+    const response = await fetch(`https://api.webflow.com/v2/sites/${process.env.WEBFLOW_SITE_ID}/users/${email}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
