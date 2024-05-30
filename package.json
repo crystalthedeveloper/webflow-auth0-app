@@ -4,8 +4,8 @@
   "description": "",
   "main": "api/index.js",
   "scripts": {
-    "start": "node pages/api/deleteUser.js",
-    "build": "parcel build pages/api/deleteUser.js"
+    "start": "node pages/api/server.js",
+    "build": "parcel build pages/api/server.js"
   },
   "author": "",
   "license": "ISC",

@@ -1,118 +1,74 @@
-var $7Uu7Z$express = require("express");
-var $7Uu7Z$httpproxymiddleware = require("http-proxy-middleware");
-var $7Uu7Z$dotenv = require("dotenv");
+var $44ACY$express = require("express");
+var $44ACY$httpproxymiddleware = require("http-proxy-middleware");
+var $44ACY$dotenv = require("dotenv");
+var $44ACY$cors = require("cors");
 require("node-fetch");
-var $7Uu7Z$cors = require("cors");
 
 
 
-var $8c7a90f1c90ba1b0$require$createProxyMiddleware = $7Uu7Z$httpproxymiddleware.createProxyMiddleware;
+var $dc3d2287a8387781$require$createProxyMiddleware = $44ACY$httpproxymiddleware.createProxyMiddleware;
 
 
 
-$8c7a90f1c90ba1b0$importAsync$c3666201f05dcae.then((fetch1)=>{
+$dc3d2287a8387781$importAsync$c012307197ada658.then((fetch1)=>{
 // Now you can use fetch here
 }).catch((err)=>{
     console.error("Failed to import node-fetch:", err);
 });
-$7Uu7Z$dotenv.config();
-const $8c7a90f1c90ba1b0$var$app = $7Uu7Z$express();
+$44ACY$dotenv.config();
+const $dc3d2287a8387781$var$app = $44ACY$express();
 // CORS middleware
-$8c7a90f1c90ba1b0$var$app.use($7Uu7Z$cors({
+$dc3d2287a8387781$var$app.use($44ACY$cors({
     origin: "https://firststep-46e83b.webflow.io",
     methods: "GET, POST, PUT, DELETE, OPTIONS",
     allowedHeaders: "Content-Type, Authorization"
 }));
 // Handle preflight requests
-$8c7a90f1c90ba1b0$var$app.options("*", $7Uu7Z$cors());
+$dc3d2287a8387781$var$app.options("*", $44ACY$cors());
 // Body parsing middleware
-$8c7a90f1c90ba1b0$var$app.use($7Uu7Z$express.json());
-// POST route for updating user quiz completion count
-$8c7a90f1c90ba1b0$var$app.post("/api/updateUser", async (req, res)=>{
-    const { email: email, newQuizCompletionCount: newQuizCompletionCount } = req.body;
+$dc3d2287a8387781$var$app.use($44ACY$express.json());
+// Function to add user to Webflow CMS collection
+async function $dc3d2287a8387781$var$addMemberToCMS(email) {
     try {
-        const response = await fetch(`https://api.webflow.com/v2/sites/${"65f0d5739b651eae06b2ca56"}/users/${email}`, {
-            method: "PATCH",
+        const url = `https://api.webflow.com/v2/collections/${"6658bd9d61addf55d7168071"}/items`;
+        const options = {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${"327ee845b726bd57582609e4e09f49ebf127a13505929147b8791fd7eac3d451"}`
+                "Authorization": `Bearer ${"6120a097eb56ff67a7c6921b2057ac307dcd72c5df9b39ece164fa38615ea725"}`
             },
             body: JSON.stringify({
-                "quiz-completion-count": newQuizCompletionCount
+                fields: {
+                    email: email
+                }
             })
-        });
-        const json = await response.json();
-        if (response.ok) res.status(200).json({
-            message: `Webflow user account updated successfully for ${email}`,
-            data: json
-        });
-        else res.status(400).json({
-            error: "Failed to update Webflow user account",
-            data: json
-        });
+        };
+        const response = await fetch(url, options);
+        const data = await response.json();
+        console.log("User added to CMS collection:", data);
     } catch (error) {
-        console.error("Error updating Webflow user account:", error);
-        res.status(500).json({
-            error: "Internal Server Error"
-        });
+        console.error("Error adding user to CMS collection:", error);
     }
-});
-// DELETE route for deleting user account
-$8c7a90f1c90ba1b0$var$app.delete("/api/deleteUser", async (req, res)=>{
-    const { email: email } = req.body;
+}
+// Signup route
+$dc3d2287a8387781$var$app.post("/signup", async (req, res)=>{
+    const { email: email, password: password } = req.body;
     try {
-        const response = await fetch(`https://api.webflow.com/v2/sites/${"65f0d5739b651eae06b2ca56"}/users/${email}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${"327ee845b726bd57582609e4e09f49ebf127a13505929147b8791fd7eac3d451"}`
-            }
-        });
-        const json = await response.json();
-        if (response.ok) res.status(200).json({
-            message: `Webflow user account deleted successfully for ${email}`,
-            data: json
-        });
-        else res.status(400).json({
-            error: "Failed to delete Webflow user account",
-            data: json
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        await $dc3d2287a8387781$var$addMemberToCMS(email); // Add user to membership CMS collection
+        res.status(200).json({
+            message: "User signed up successfully"
         });
     } catch (error) {
-        console.error("Error deleting Webflow user account:", error);
+        console.error("Sign-up error:", error.message);
         res.status(500).json({
-            error: "Internal Server Error"
+            error: "Error signing up"
         });
     }
 });
-// Proxy middleware options
-const $8c7a90f1c90ba1b0$var$options = {
-    target: "https://api.webflow.com",
-    changeOrigin: true,
-    pathRewrite: {
-        "^/api": ""
-    },
-    onProxyReq: (proxyReq, req, res)=>{
-        // Debug: Log the target and headers to verify
-        console.log(`Proxying request to: ${$8c7a90f1c90ba1b0$var$options.target}`);
-        console.log("Request headers:", req.headers);
-        proxyReq.setHeader("Authorization", `Bearer ${"327ee845b726bd57582609e4e09f49ebf127a13505929147b8791fd7eac3d451"}`);
-    },
-    onProxyRes: (proxyRes, req, res)=>{
-        // Set CORS headers
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    }
-};
-// Debug: Log the entire options object
-console.log("Proxy options:", $8c7a90f1c90ba1b0$var$options);
-// Create the proxy
-const $8c7a90f1c90ba1b0$var$apiProxy = $8c7a90f1c90ba1b0$require$createProxyMiddleware($8c7a90f1c90ba1b0$var$options);
-// Use the proxy middleware
-$8c7a90f1c90ba1b0$var$app.use("/api", $8c7a90f1c90ba1b0$var$apiProxy);
-const $8c7a90f1c90ba1b0$var$PORT = "1234";
-$8c7a90f1c90ba1b0$var$app.listen($8c7a90f1c90ba1b0$var$PORT, ()=>{
-    console.log(`Proxy server is running on port ${$8c7a90f1c90ba1b0$var$PORT}`);
+const $dc3d2287a8387781$var$PORT = "1234";
+$dc3d2287a8387781$var$app.listen($dc3d2287a8387781$var$PORT, ()=>{
+    console.log(`Server is running on port ${$dc3d2287a8387781$var$PORT}`);
 });
 
 
