@@ -98,8 +98,10 @@ const $8c7a90f1c90ba1b0$var$options = {
         proxyReq.setHeader("Authorization", `Bearer ${"327ee845b726bd57582609e4e09f49ebf127a13505929147b8791fd7eac3d451"}`);
     },
     onProxyRes: (proxyRes, req, res)=>{
-        // Debug: Log the response headers
-        console.log("Response headers:", proxyRes.headers);
+        // Set CORS headers
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     }
 };
 // Debug: Log the entire options object
