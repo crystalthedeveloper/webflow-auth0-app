@@ -1,6 +1,7 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const dotenv = require('dotenv');
+const cors = require('cors');
 import('node-fetch').then(fetch => {
   // Now you can use fetch here
 }).catch(err => {
@@ -12,20 +13,14 @@ dotenv.config();
 const app = express();
 
 // CORS middleware
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://firststep-46e83b.webflow.io');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  next();
-});
+app.use(cors({
+  origin: 'https://firststep-46e83b.webflow.io', // Allow only the Webflow origin
+  methods: 'GET, POST, PUT, DELETE, OPTIONS',
+  allowedHeaders: 'Content-Type, Authorization'
+}));
 
 // Handle preflight requests
-app.options('*', (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://firststep-46e83b.webflow.io');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.status(200).send();
-});
+app.options('*', cors());
 
 // Body parsing middleware
 app.use(express.json());
@@ -36,7 +31,7 @@ app.post('/api/updateUser', async (req, res) => {
 
   try {
     const response = await fetch(`https://api.webflow.com/users/${email}`, {
-      method: 'PUT', // Use PUT to update user data
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${process.env.WEBFLOW_API_TOKEN}`,
@@ -63,7 +58,7 @@ app.delete('/api/deleteUser', async (req, res) => {
 
   try {
     const response = await fetch(`https://api.webflow.com/users/${email}`, {
-      method: 'DELETE', // Use DELETE to delete user account
+      method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${process.env.WEBFLOW_API_TOKEN}`,
