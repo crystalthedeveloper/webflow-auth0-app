@@ -31,29 +31,54 @@ app.options('*', (req, res) => {
 app.use(express.json());
 
 // POST route for updating user quiz completion count
-app.post('/api/updateQuizCompletionCount', async (req, res) => {
-  const { email, newCount } = req.body;
+app.post('/api/updateUser', async (req, res) => {
+  const { email, newQuizCompletionCount } = req.body;
 
-  // Add your logic here to update the user's quiz completion count
   try {
     const response = await fetch(`https://api.webflow.com/users/${email}`, {
-      method: 'POST', // Use POST instead of PUT
+      method: 'PUT', // Use PUT to update user data
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${process.env.WEBFLOW_API_TOKEN}`,
       },
-      body: JSON.stringify({ 'quiz-completion-count': newCount }), // Update the quiz completion count
+      body: JSON.stringify({ 'quiz-completion-count': newQuizCompletionCount }),
     });
 
     const json = await response.json();
 
     if (response.ok) {
-      res.status(200).json({ message: `Quiz completion count updated for user with email ${email}`, data: json });
+      res.status(200).json({ message: `Webflow user account updated successfully for ${email}`, data: json });
     } else {
-      res.status(400).json({ error: 'Failed to update quiz completion count for user', data: json });
+      res.status(400).json({ error: 'Failed to update Webflow user account', data: json });
     }
   } catch (error) {
-    console.error('Error updating quiz completion count:', error);
+    console.error('Error updating Webflow user account:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// DELETE route for deleting user account
+app.delete('/api/deleteUser', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const response = await fetch(`https://api.webflow.com/users/${email}`, {
+      method: 'DELETE', // Use DELETE to delete user account
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.WEBFLOW_API_TOKEN}`,
+      },
+    });
+
+    const json = await response.json();
+
+    if (response.ok) {
+      res.status(200).json({ message: `Webflow user account deleted successfully for ${email}`, data: json });
+    } else {
+      res.status(400).json({ error: 'Failed to delete Webflow user account', data: json });
+    }
+  } catch (error) {
+    console.error('Error deleting Webflow user account:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
