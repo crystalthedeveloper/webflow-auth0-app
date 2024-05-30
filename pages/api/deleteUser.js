@@ -91,12 +91,6 @@ const options = {
     console.log('Request headers:', req.headers);
     proxyReq.setHeader('Authorization', `Bearer ${process.env.WEBFLOW_API_TOKEN}`);
   },
-  onProxyRes: (proxyRes, req, res) => {
-    // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  },
 };;
 
 // Debug: Log the entire options object
