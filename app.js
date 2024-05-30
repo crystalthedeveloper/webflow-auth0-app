@@ -7,12 +7,8 @@ dotenv.config();
 
 const app = express();
 
-// Enable CORS for your frontend application
-app.use(cors({
-  origin: 'https://firststep-46e83b.webflow.io',
-  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// Enable CORS for all origins
+app.use(cors());
 
 // Proxy middleware options
 const options = {
