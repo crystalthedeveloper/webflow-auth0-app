@@ -14,7 +14,7 @@ const app = express();
 // CORS middleware
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', 'https://firststep-46e83b.webflow.io');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 // Handle preflight requests
 app.options('*', (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', 'https://firststep-46e83b.webflow.io');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.status(200).send();
 });
@@ -30,18 +30,30 @@ app.options('*', (req, res) => {
 // Body parsing middleware
 app.use(express.json());
 
-// DELETE route for deleting user by email
-app.delete('/api/deleteUser', async (req, res) => {
-  const { email } = req.body;
+// PUT route for updating user quiz completion count
+app.put('/api/updateQuizCompletionCount', async (req, res) => {
+  const { email, newCount } = req.body;
 
-  // Add your logic here to handle the deletion of the user by email
-  // For example, you can delete the user from the database or make additional requests to external APIs
-  // Handle errors and send appropriate responses
+  // Add your logic here to update the user's quiz completion count
   try {
-    // Delete user logic here
-    res.status(200).json({ message: `User with email ${email} deleted successfully` });
+    const response = await fetch(`https://api.webflow.com/users/${email}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.WEBFLOW_API_TOKEN}`,
+      },
+      body: JSON.stringify({ 'quiz-completion-count': newCount }), // Update the quiz completion count
+    });
+
+    const json = await response.json();
+
+    if (response.ok) {
+      res.status(200).json({ message: `Quiz completion count updated for user with email ${email}`, data: json });
+    } else {
+      res.status(400).json({ error: 'Failed to update quiz completion count for user', data: json });
+    }
   } catch (error) {
-    console.error('Error deleting user:', error);
+    console.error('Error updating quiz completion count:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -49,9 +61,9 @@ app.delete('/api/deleteUser', async (req, res) => {
 // Proxy middleware options
 const options = {
   target: 'https://api.webflow.com', // target host
-  changeOrigin: true,                // needed for virtual hosted sites
+  changeOrigin: true, // needed for virtual hosted sites
   pathRewrite: {
-    '^/api': '',                     // remove base path
+    '^/api': '', // remove base path
   },
   onProxyReq: (proxyReq, req, res) => {
     // Debug: Log the target and headers to verify
@@ -62,7 +74,7 @@ const options = {
   onProxyRes: (proxyRes, req, res) => {
     // Debug: Log the response headers
     console.log('Response headers:', proxyRes.headers);
-  }
+  },
 };
 
 // Debug: Log the entire options object
