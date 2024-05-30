@@ -1,79 +1,68 @@
+// server.js
+const express = require('express');
+const cors = require('cors');
 import('node-fetch').then(fetch => {
   // Now you can use fetch here
 }).catch(err => {
   console.error('Failed to import node-fetch:', err);
 });
-const dotenv = require('dotenv');
 const admin = require('firebase-admin');
+const dotenv = require('dotenv');
 
-// Load environment variables from .env file
 dotenv.config();
 
-// Initialize Firebase Admin SDK with service account credentials
+const app = express();
+app.use(express.json());
+app.use(cors({
+  origin: 'https://firststep-46e83b.webflow.io',
+  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 admin.initializeApp({
   credential: admin.credential.cert({
-    projectId: process.env.FIREBASE_PROJECT_ID, // Firebase project ID
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL, // Firebase service account email
-    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') // Firebase service account private key
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
   })
 });
 
-module.exports = async (req, res) => {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', 'https://firststep-46e83b.webflow.io');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+app.delete('/deleteUser', async (req, res) => {
+  const { email } = req.body;
 
-  if (req.method === 'OPTIONS') {
-    // Handle preflight requests
-    res.setHeader('Access-Control-Allow-Origin', 'https://firststep-46e83b.webflow.io');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    return res.status(200).end();
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
   }
 
-  // Your function logic
-  if (req.method === 'DELETE') {
-    // Retrieve environment variables
-    const WEBFLOW_API_TOKEN = process.env.WEBFLOW_API_TOKEN;
-    const WEBFLOW_SITE_ID = process.env.WEBFLOW_SITE_ID;
-    const { email } = req.body;  // Expect email in the request body
+  try {
+    const user = await admin.auth().getUserByEmail(email);
+    await admin.auth().deleteUser(user.uid);
 
-    if (!email) {
-      return res.status(400).json({ error: 'Email is required' });
-    }
-
-    try {
-      // Delete user from Firebase
-      const user = await admin.auth().getUserByEmail(email);
-      await admin.auth().deleteUser(user.uid);
-
-      // Delete user from Webflow
-      const url = `https://api.webflow.com/v2/sites/${WEBFLOW_SITE_ID}/users/${user.uid}`; // Webflow API endpoint
-      const options = {
-        method: 'DELETE', // HTTP DELETE method
-        headers: {
-          'Authorization': `Bearer ${WEBFLOW_API_TOKEN}`, // Authorization header with Webflow API token
-          'Accept': 'application/json' // Accept JSON response
-        }
-      };
-
-      const response = await fetch(url, options); // Send DELETE request to Webflow API
-
-      if (!response.ok) {
-        const errorData = await response.json(); // Extract error data from response
-        return res.status(response.status).json({ error: errorData }); // Return error response
+    const url = `https://api.webflow.com/v2/sites/${process.env.WEBFLOW_SITE_ID}/users/${user.uid}`;
+    const options = {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${process.env.WEBFLOW_API_TOKEN}`,
+        'Accept': 'application/json'
       }
+    };
 
-      const json = await response.json(); // Parse JSON response
-      return res.json({ success: true, data: json }); // Return success response with data
-    } catch (error) {
-      console.error('Error deleting user accounts:', error);
-      // Handle other potential errors
-      return res.status(500).json({ error: 'Internal Server Error' }); // Return 500 Internal Server Error response
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return res.status(response.status).json({ error: errorData });
     }
-  }
 
-  // Handle other HTTP methods
-  res.status(404).send('Not Found');
-};
+    const json = await response.json();
+    return res.json({ success: true, data: json });
+  } catch (error) {
+    console.error('Error deleting user accounts:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+const PORT = process.env.PORT || 1234;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
