@@ -15,6 +15,13 @@ $8c7a90f1c90ba1b0$var$app.use((req, res, next)=>{
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     next();
 });
+// Handle preflight requests
+$8c7a90f1c90ba1b0$var$app.options("*", (req, res)=>{
+    res.setHeader("Access-Control-Allow-Origin", "https://firststep-46e83b.webflow.io");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.status(200).send();
+});
 // Proxy middleware options
 const $8c7a90f1c90ba1b0$var$options = {
     target: "https://api.webflow.com",
