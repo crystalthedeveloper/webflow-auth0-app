@@ -8,7 +8,7 @@
   "builds": [
     {
       "src": "pages/api/deleteUser.js",
-      "use": "@now/node"
+      "use": "@vercel/node"
     }
   ]
 }
